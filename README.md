@@ -1,9 +1,9 @@
 # Maze-Maverick
- Maze Maverick is a C++ terminal-based maze generation and solving program, developed in collaboration with the Computer Science Scientific Association of Iran University of Science and Technology.
+ Maze Maverick is a C++ terminal-based maze generation and solving program developed in collaboration with the Computer Science Scientific Association of Iran University of Science and Technology.
 
 Maze Maverick 🎩🌀
 
-Maze Maverick is an interactive maze generation and solving program written in C++, designed to run in a terminal environment. Developed in collaboration with the Computer Science Scientific Association of Iran University of Science and Technology, this project was part of a foundational programming course.
+Maze Maverick is an interactive maze generation and solving program written in C++ designed to run in a terminal environment. Developed in collaboration with the Computer Science Scientific Association of Iran University of Science and Technology, this project was part of a foundational programming course.
 
 🏆 Features
 
