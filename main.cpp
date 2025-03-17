@@ -10,6 +10,7 @@
 #define RED     "\033[91m"
 #define MAGENTA "\033[95m"
 #define WHITE   "\033[97m"
+
 using namespace std;
 using namespace chrono;
 
@@ -42,6 +43,11 @@ invalid:
 }
 void easy_maze(){
     int x,y,p,al,au,bl,bu;string name;
+    cout << YELLOW << "How many rows do you like to have?" << endl;
+    cin >> x;
+    cout << YELLOW << "How many columns do you like to have?" << endl;
+    cin >> y;
+    p = x + y - 2;
 
 }
 void hard_maze(){
