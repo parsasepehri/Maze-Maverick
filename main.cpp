@@ -41,13 +41,41 @@ invalid:
     }
     return num;
 }
+bool isnumber(string num){
+    if(num[0] == '-'){
+        for(int i = 1; i < num.size(); i++)
+            if(isdigit(num[i]) == false)
+                return false;
+        return true;
+    }
+    else{
+        for(int i = 0; i < num.size(); i++)
+            if(isdigit(num[i]) == false)
+                return false;
+        return true;
+    }
+}
 void easy_maze(){
-    int x,y,p,al,au,bl,bu;string name;
-    cout << YELLOW << "How many rows do you like to have?" << endl;
-    cin >> x;
-    cout << YELLOW << "How many columns do you like to have?" << endl;
-    cin >> y;
-    p = x + y - 2;
+    string row,column,al,au,bl,bu,map_name;int path_size;
+    cout << YELLOW << "Choose your map name: " << RESET << endl;
+    cin >> map_name;
+
+    cout << YELLOW << "How many rows do you like to have?" << RESET << endl;
+    check_row:
+    cin >> row;
+    if(isnumber(row) == false || stoi(row) <= 1){
+        cout << RED << "Please enter a valid number which should be greater than 1: " << RESET << endl;
+        goto check_row;
+    }
+    cout << YELLOW << "How many columns do you like to have?" << RESET << endl;
+    check_column:
+    cin >> column;
+    if(isnumber(column) == false || stoi(column) <= 1){
+        cout << RED << "Please enter a valid number which should be greater than 1: " << RESET << endl;
+        goto check_column;
+    }
+    path_size = stoi(row) + stoi(column) - 2;
+    //inja bayad bfs bezanim
 
 }
 void hard_maze(){
@@ -63,7 +91,7 @@ start:
         cout  << BOLD << MAGENTA << "________Making a new maze map________" << RESET << endl;
         cout << GREEN << "1. " << YELLOW << "Easy mode" << RESET << endl;
         cout << GREEN << "2. " << YELLOW << "Hard mode" << RESET << endl;
-        cout << GREEN << "3. " << YELLOW << "Return" << RESET << endl;
+        cout << GREEN << "3. " << YELLOW << "Return back to menu" << RESET << endl;
         invalid:
         cin >> choice;
         if(choice != "1" && choice != "2" && choice != "3"){
