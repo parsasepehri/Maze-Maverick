@@ -406,7 +406,7 @@ int main(){
 start:
     string choice = show_menu();
     if(choice == "1"){
-        cout  << BOLD << MAGENTA << "________Making a new maze map________" << RESET << endl;
+        cout  << BOLD << MAGENTA << "________MAKING A NEW MAZE MAP________" << RESET << endl;
         cout << GREEN << "1. " << YELLOW << "Easy mode" << RESET << endl;
         cout << GREEN << "2. " << YELLOW << "Hard mode" << RESET << endl;
         cout << GREEN << "3. " << YELLOW << "Return back to menu" << RESET << endl;
@@ -420,10 +420,10 @@ start:
             //loading animation
             char loading[] = {'|', '/', '-', '\\'};
             int i = 0;
-            cout << CYAN << "Making the maze ";
+            cout << CYAN << "Wait a minute ";
             cout.flush();
             for (int j = 0; j < 20; ++j) {
-                cout << "\rMaking the maze " << loading[i % 4];
+                cout << "\rWait a minute " << loading[i % 4];
                 cout.flush();//immediately print in console
                 this_thread::sleep_for(milliseconds(250));
                 i++;
@@ -435,10 +435,10 @@ start:
             //loading animation
             char loading[] = {'|', '/', '-', '\\'};
             int i = 0;
-            cout << CYAN << "Making the maze ";
+            cout << CYAN << "Wait a minute ";
             cout.flush();
             for (int j = 0; j < 20; ++j) {
-                cout << "\rMaking the maze " << loading[i % 4];
+                cout << "\rWait a minute " << loading[i % 4];
                 cout.flush();//immediately print in console
                 this_thread::sleep_for(milliseconds(250));
                 i++;
@@ -447,11 +447,76 @@ start:
             hard_maze();
         }
         else{
+            //loading animation
+            char loading[] = {'|', '/', '-', '\\'};
+            int i = 0;
+            cout << CYAN << "Coming back to menu ";
+            cout.flush();
+            for (int j = 0; j < 20; ++j) {
+                cout << "\rComing back to menu " << loading[i % 4];
+                cout.flush();//immediately print in console
+                this_thread::sleep_for(milliseconds(250));
+                i++;
+            }
+            cout << RESET << endl;
             goto start;
         }
     }
     else if(choice == "2"){
+        cout  << BOLD << MAGENTA << "________PLAYGROUND________" << RESET << endl;
+        cout << GREEN << "1. " << YELLOW << "Choose a map from existing maps" << RESET << endl;
+        cout << GREEN << "2. " << YELLOW << "Import your custom map" << RESET << endl;
+        cout << GREEN << "3. " << YELLOW << "Return back to menu" << RESET << endl;
+        invalid2:
+        cin >> choice;
+        if(choice != "1" && choice != "2" && choice != "3"){
+            cout << RED << "Invalid choice,please choose an option (1-3): " << RESET << endl;
+            goto invalid2;
+        }
+        if(choice == "1"){
+            //loading animation
+            char loading[] = {'|', '/', '-', '\\'};
+            int i = 0;
+            cout << CYAN << "Wait a minute ";
+            cout.flush();
+            for (int j = 0; j < 20; ++j) {
+                cout << "\rWait a minute " << loading[i % 4];
+                cout.flush();//immediately print in console
+                this_thread::sleep_for(milliseconds(250));
+                i++;
+            }
+            cout << RESET << endl;
 
+        }
+        else if(choice == "2"){
+            //loading animation
+            char loading[] = {'|', '/', '-', '\\'};
+            int i = 0;
+            cout << CYAN << "Wait a minute ";
+            cout.flush();
+            for (int j = 0; j < 20; ++j) {
+                cout << "\rWait a minute " << loading[i % 4];
+                cout.flush();//immediately print in console
+                this_thread::sleep_for(milliseconds(250));
+                i++;
+            }
+            cout << RESET << endl;
+        }
+        else{
+            //loading animation
+            char loading[] = {'|', '/', '-', '\\'};
+            int i = 0;
+            cout << CYAN << "Coming back to menu ";
+            cout.flush();
+            for (int j = 0; j < 20; ++j) {
+                cout << "\rComing back to menu " << loading[i % 4];
+                cout.flush();//immediately print in console
+                this_thread::sleep_for(milliseconds(250));
+                i++;
+            }
+            cout << RESET << endl;
+            goto start;
+        }
     }
     else if(choice == "3"){
 
