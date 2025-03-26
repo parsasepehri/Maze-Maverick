@@ -13,6 +13,40 @@
 
 using namespace std;
 using namespace chrono;
+const int maxx = numeric_limits<int>::max();
+
+bool dfs(int x,int y,int x_end,int y_end,int steps,int length,vector<vector<bool>>& mark,vector<vector<int>>& grid){
+    if(steps > length){
+        return false;
+    }
+    if(x == x_end && y == y_end && steps == length){
+        grid[x][y] = -1;
+        return true;
+    }
+    if(x < 0 || x > x_end || y < 0 || y > y_end){
+        return false;
+    }
+    if(mark[x][y] == true || grid[x][y] == 0){
+        return false;
+    }
+    mark[x][y] = true;
+    grid[x][y] = -1;
+    if(dfs(x + 0,y + 1,x_end,y_end,steps + 1,length,mark,grid)){
+        return true;
+    }
+    if(dfs(x + 0,y - 1,x_end,y_end,steps + 1,length,mark,grid)){
+        return true;
+    }
+    if(dfs(x + 1,y + 0,x_end,y_end,steps + 1,length,mark,grid)){
+        return true;
+    }
+    if(dfs(x - 1,y + 0,x_end,y_end,steps + 1,length,mark,grid)){
+        return true;
+    }
+    mark[x][y] = false;
+    grid[x][y] = maxx;
+    return false;
+}
 
 string show_menu() {
     system("cls");
@@ -60,7 +94,7 @@ string fix_name(string filename) {
     return filename;
 }
 void easy_maze(){
-    string row_check,column_check,map_name;int path_size;const int maxx = numeric_limits<int>::max();
+    string row_check,column_check,map_name;int path_size;
     //getting map name to save it
     cout << YELLOW << "Choose your map name: " << RESET;
     cout.flush();
@@ -180,7 +214,6 @@ void easy_maze(){
 }
 void hard_maze(){
     string row_check,column_check,map_name,path_check,cell_min_check,cell_max_check,block_max_check,block_min_check;int path_size,cell_min,cell_max,block_min,block_max;
-    const int maxx = numeric_limits<int>::max();
     //getting map name to save it
     cout << YELLOW << "Choose your map name: " << RESET;
     cout.flush();
@@ -208,6 +241,8 @@ void hard_maze(){
         goto check_column;
     }
     const int cols = stoi(column_check);
+    //the maze definition
+    vector<vector<int>> grid(rows,vector<int>(cols,0));
     //getting maximum and minimum of maze cells
     cout << YELLOW << "Choose a minimum for your maze cells: " << RESET << endl;
     check_minimum:
@@ -235,7 +270,26 @@ void hard_maze(){
         goto check_path;
     }
     path_size = stoi(path_check);
-    //inja bayad check beshe path vojod dare
+    //initializing the maze so it can help us make blocks and others later
+    for(int i = 0;i < rows;i++){
+        for(int j = 0;j < cols; j++){
+            maze[i][j] = maxx;
+        }
+    }
+    //checking whether the way exists
+    dfs_check:
+    vector<vector<bool>> mark(rows, vector<bool>(cols, 0));
+    if(!dfs(0,0,rows - 1,cols - 1,0,path_size,mark,grid)){
+        cout << RED << "There is no path with this number of steps,please enter a valid one: " << RESET << endl;
+        check_path2:
+        cin >> path_check;
+        if(isnumber(path_check) == false || stoi(path_check) <= 1){
+            cout << RED << "Please enter a valid number which should be greater than 1: " << RESET << endl;
+            goto check_path2;
+        }
+        path_size = stoi(path_check);
+        goto dfs_check;
+    }
     //getting maximum and minimum of blocks
     cout << YELLOW << "Choose a minimum number of the blocks: " << RESET << endl;
     check_minimum2:
@@ -258,25 +312,6 @@ void hard_maze(){
     mt19937 g(rd());
     uniform_int_distribution<int> matrix_limit(cell_min,cell_max);
     uniform_int_distribution<int> block_limit(block_min, block_max);
-    int maze[rows][cols];
-    //initializing the maze so it can help us make blocks and others later
-    for(int i = 0;i < rows;i++){
-        for(int j = 0;j < cols; j++){
-            maze[i][j] = maxx;
-        }
-    }
-    //we are recording the steps we can go
-    vector<char> steps;
-    //we have to go row - 1 times down
-    for(int i = 0;i < rows - 1; i++){
-        steps.push_back('d');
-    }
-    //we have to go column - 1 times right
-    for(int i = 0;i < cols - 1; i++){
-        steps.push_back('r');
-    }
-    //we have to shuffle the steps so that we can have different ways to reach the last one
-    shuffle(steps.begin(),steps.end(), g);
     int num = 0,x = 0,y = 0,sum = 0;
     //initializing the way we have
     for(int i = 0; i < steps.size();i++){
