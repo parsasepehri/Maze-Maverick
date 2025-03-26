@@ -32,17 +32,15 @@ bool dfs(int x,int y,int x_end,int y_end,int steps,int length,vector<vector<bool
     }
     mark[x][y] = true;
     grid[x][y] = -1;
-    if(dfs(x + 0,y + 1,x_end,y_end,steps + 1,length,mark,grid)){
-        return true;
-    }
-    if(dfs(x + 0,y - 1,x_end,y_end,steps + 1,length,mark,grid)){
-        return true;
-    }
-    if(dfs(x + 1,y + 0,x_end,y_end,steps + 1,length,mark,grid)){
-        return true;
-    }
-    if(dfs(x - 1,y + 0,x_end,y_end,steps + 1,length,mark,grid)){
-        return true;
+
+    vector<pair<int, int>> directions = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+    random_device rd;
+    mt19937 g(rd());
+    shuffle(directions.begin(), directions.end(), g);
+    for(auto [dx, dy] : directions) {
+        if (dfs(x + dx, y + dy, x_end, y_end, steps + 1, length, mark, grid)) {
+            return true;
+        }
     }
     mark[x][y] = false;
     grid[x][y] = maxx;
@@ -361,23 +359,19 @@ check_maximum2:
                         grid[i][j] = num;
                         sum += num;
                     }
-                    cout << CYAN << i << " " << j << " " << grid[i][j] << endl;
                 }
             }
         }
     }
     //here we are initializing others which are not in our path
     int number_of_blocks = block_limit(g), counts = 0;
-    cout << RED << "number of blocks: " << number_of_blocks << endl;
     uniform_int_distribution<int> matrix_i(0,rows - 1);
     uniform_int_distribution<int> matrix_j(0,cols - 1);
     while(counts < number_of_blocks){
         int nx = matrix_i(g),ny = matrix_j(g);
         if(grid[nx][ny] == maxx){
-            cout << YELLOW << nx << " " << ny << " " << grid[nx][ny] << endl;
             grid[nx][ny] = 0;
             counts++;
-            cout << counts << endl;
         }
     }
     for(int i = 0; i < rows; i++){
