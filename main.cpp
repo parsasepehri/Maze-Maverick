@@ -19,15 +19,16 @@ bool dfs(int x,int y,int x_end,int y_end,int steps,int length,vector<vector<bool
     if(steps > length){
         return false;
     }
-    if(x == x_end && y == y_end && steps == length){
-        grid[x][y] = -1;
-        return true;
-    }
     if(x < 0 || x > x_end || y < 0 || y > y_end){
         return false;
     }
-    if(mark[x][y] == true || grid[x][y] == 0){
+    if(mark[x][y] == true || grid[x][y] == -1){
         return false;
+    }
+    if(x == x_end && y == y_end && steps == length){
+        grid[x][y] = -1;
+        mark[x][y] = true;
+        return true;
     }
     mark[x][y] = true;
     grid[x][y] = -1;
@@ -92,6 +93,23 @@ bool isnumber(string num){
 string fix_name(string filename) {
     replace(filename.begin(), filename.end(), ' ', '_');
     return filename;
+}
+bool isvalid_name(const string& filename){
+    string invalid_char = ")?(/\`>!@#$|%<'^;&],:[";
+    if(filename.empty()){
+        return false;
+    }
+    if(filename.length() > 255){
+        return false;
+    }
+    for(char ch1 : filename){
+        for(char ch2 : invalid_char){
+            if(ch1 == ch2){
+                return false;
+            }
+        }
+    }
+    return true;
 }
 void easy_maze(){
     string row_check,column_check,map_name;int path_size;
@@ -215,15 +233,20 @@ void easy_maze(){
 void hard_maze(){
     string row_check,column_check,map_name,path_check,cell_min_check,cell_max_check,block_max_check,block_min_check;int path_size,cell_min,cell_max,block_min,block_max;
     //getting map name to save it
-    cout << YELLOW << "Choose your map name: " << RESET;
-    cout.flush();
+    cout << YELLOW << "Enter your map name: " << RESET;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
+map_name_error:
+    cout.flush();
     getline(cin,map_name);
+    if(!isvalid_name(map_name)){
+        cout << RED << "Please avoid special characters,enter a valid name: " << RESET << endl;
+        goto map_name_error;
+    }
     map_name = fix_name(map_name);//here we use that function to replace spaces with '_'
     cout << endl;
     //getting number of rows
     cout << YELLOW << "How many rows do you like to have?" << RESET << endl;
-    check_row:
+check_row:
     cin >> row_check;
     //checking for valid row
     if(isnumber(row_check) == false || stoi(row_check) <= 1){
@@ -233,7 +256,7 @@ void hard_maze(){
     const int rows = stoi(row_check);
     //getting number of columns
     cout << YELLOW << "How many columns do you like to have?" << RESET << endl;
-    check_column:
+check_column:
     cin >> column_check;
     //checking for valid column
     if(isnumber(column_check) == false || stoi(column_check) <= 1){
@@ -244,16 +267,16 @@ void hard_maze(){
     //the maze definition
     vector<vector<int>> grid(rows,vector<int>(cols,0));
     //getting maximum and minimum of maze cells
-    cout << YELLOW << "Choose a minimum for your maze cells: " << RESET << endl;
-    check_minimum:
+    cout << YELLOW << "Enter a minimum for your maze cells: " << RESET << endl;
+check_minimum:
     cin >> cell_min_check;
     if(isnumber(cell_min_check) == false){
         cout << RED << "Please enter a valid number: " << RESET << endl;
         goto check_minimum;
     }
     cell_min = stoi(cell_min_check);
-    cout << YELLOW << "Choose a maximum for your maze cells: " << RESET << endl;
-    check_maximum:
+    cout << YELLOW << "Enter a maximum for your maze cells: " << RESET << endl;
+check_maximum:
     cin >> cell_max_check;
     if(isnumber(cell_max_check) == false || stoi(cell_max_check) < cell_min){
         cout << RED << "Please enter a valid number: " << RESET << endl;
@@ -262,7 +285,7 @@ void hard_maze(){
     cell_max = stoi(cell_max_check);
     //getting number of steps
     cout << YELLOW << "How many steps are there in your path?" << RESET << endl;
-    check_path:
+check_path:
     cin >> path_check;
     //checking for valid path number
     if(isnumber(path_check) == false || stoi(path_check) <= 1){
@@ -273,11 +296,11 @@ void hard_maze(){
     //initializing the maze so it can help us make blocks and others later
     for(int i = 0;i < rows;i++){
         for(int j = 0;j < cols; j++){
-            maze[i][j] = maxx;
+            grid[i][j] = maxx;
         }
     }
     //checking whether the way exists
-    dfs_check:
+dfs_check:
     vector<vector<bool>> mark(rows, vector<bool>(cols, 0));
     if(!dfs(0,0,rows - 1,cols - 1,0,path_size,mark,grid)){
         cout << RED << "There is no path with this number of steps,please enter a valid one: " << RESET << endl;
@@ -291,8 +314,8 @@ void hard_maze(){
         goto dfs_check;
     }
     //getting maximum and minimum of blocks
-    cout << YELLOW << "Choose a minimum number of the blocks: " << RESET << endl;
-    check_minimum2:
+    cout << YELLOW << "Enter a minimum number of the blocks: " << RESET << endl;
+check_minimum2:
     cin >> block_min_check;
     if(isnumber(block_min_check) == false || stoi(block_min_check) < 0){
         cout << RED << "Please enter a valid number: " << RESET << endl;
@@ -300,9 +323,9 @@ void hard_maze(){
     }
     block_min = stoi(block_min_check);
     cout << YELLOW << "Choose a maximum number of the blocks: " << RESET << endl;
-    check_maximum2:
+check_maximum2:
     cin >> block_max_check;
-    if(isnumber(block_max_check) == false || stoi(block_max_check) < block_min || stoi(block_max_check) > rows * cols - path_size){
+    if(isnumber(block_max_check) == false || stoi(block_max_check) < block_min || stoi(block_max_check) >= rows * cols - path_size){
         cout << RED << "Please enter a valid number: " << RESET << endl;
         goto check_maximum2;
     }
@@ -312,55 +335,60 @@ void hard_maze(){
     mt19937 g(rd());
     uniform_int_distribution<int> matrix_limit(cell_min,cell_max);
     uniform_int_distribution<int> block_limit(block_min, block_max);
-    int num = 0,x = 0,y = 0,sum = 0;
+    int num = 0,sum = 0;
     //initializing the way we have
-    for(int i = 0; i < steps.size();i++){
-        if(i == steps.size() - 2){
-            zero_error:
-            num = matrix_limit(g);
-            if(sum + num == 0){
-                goto zero_error;
+    for(int i = 0;i < rows; i++){
+        for(int j = 0; j < cols; j++){
+            if(i == rows - 1 && j == cols - 1){
+                grid[i][j] = sum;
             }
-            maze[y][x] = num;
-            sum += num;
-        }
-        else{
-            num_error:
-            num = matrix_limit(g);
-            if(num == 0){
-                goto num_error;
+            else{
+                if(grid[i][j] == -1){
+                    num_error:
+                    num = matrix_limit(g);
+                    if(num == 0){
+                        goto num_error;
+                    }
+                    grid[i][j] = num;
+                    sum += num;
+                    if(((i == rows - 1 && j == cols - 2) || (i == rows - 2 && j == cols - 1)) && sum == 0){
+                        sum -= num;
+                        num_error2:
+                        num = matrix_limit(g);
+                        if(num + sum == 0){
+                            goto num_error2;
+                        }
+                        grid[i][j] = num;
+                        sum += num;
+                    }
+                    cout << CYAN << i << " " << j << " " << grid[i][j] << endl;
+                }
             }
-            maze[y][x] = num;
-            sum += num;
-        }
-        if(steps[i] == 'r'){
-            x++;
-        }
-        if(steps[i] == 'd'){
-            y++;
         }
     }
-    maze[rows - 1][cols - 1] = sum;
     //here we are initializing others which are not in our path
     int number_of_blocks = block_limit(g), counts = 0;
+    cout << RED << "number of blocks: " << number_of_blocks << endl;
     uniform_int_distribution<int> matrix_i(0,rows - 1);
     uniform_int_distribution<int> matrix_j(0,cols - 1);
     while(counts < number_of_blocks){
-        if(maze[matrix_i(g)][matrix_j(g)] == maxx){
-            maze[matrix_i(g)][matrix_j(g)] = 0;
+        int nx = matrix_i(g),ny = matrix_j(g);
+        if(grid[nx][ny] == maxx){
+            cout << YELLOW << nx << " " << ny << " " << grid[nx][ny] << endl;
+            grid[nx][ny] = 0;
             counts++;
+            cout << counts << endl;
         }
     }
-    num = 0;
     for(int i = 0; i < rows; i++){
         for(int j = 0;j < cols; j++){
-            if(maze[i][j] == maxx){
-                num_error2:
+            if(grid[i][j] == maxx){
+                num_error3:
                 num = matrix_limit(g);
                 if(num == 0){
-                    goto num_error2;
+                    goto num_error3;
                 }
-                maze[i][j] = num;
+                grid[i][j] = num;
             }
         }
     }
@@ -370,12 +398,12 @@ void hard_maze(){
     file << rows << " " << cols << '\n' << path_size << '\n';
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
-            file << maze[i][j] << " ";
+            file << grid[i][j] << " ";
         }
         file << '\n';
     }
     ofstream mapsfile("maps.txt", ios::app);
-    mapsfile << "\n" << map_name;
+    mapsfile << map_name << "\n";
 }
 
 
