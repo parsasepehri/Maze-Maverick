@@ -112,14 +112,19 @@ bool isvalid_name(const string& filename){
 void easy_maze(){
     string row_check,column_check,map_name;int path_size;
     //getting map name to save it
-    cout << YELLOW << "Choose your map name: " << RESET;
-    cout.flush();
+    cout << CYAN << "Enter your map name: " << RESET;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
+map_name_error:
+    cout.flush();
     getline(cin,map_name);
+    if(!isvalid_name(map_name)){
+        cout << RED << "Please avoid special characters,enter a valid name: " << RESET << endl;
+        goto map_name_error;
+    }
     map_name = fix_name(map_name);//here we use that function to replace spaces with '_'
     cout << endl;
     //getting number of rows
-    cout << YELLOW << "How many rows do you like to have?" << RESET << endl;
+    cout << CYAN << "How many rows do you like to have?" << RESET << endl;
     check_row:
     cin >> row_check;
     //checking for valid row
@@ -129,7 +134,7 @@ void easy_maze(){
     }
 
     //getting number of columns
-    cout << YELLOW << "How many columns do you like to have?" << RESET << endl;
+    cout << CYAN << "How many columns do you like to have?" << RESET << endl;
     check_column:
     cin >> column_check;
     //checking for valid column
@@ -231,7 +236,7 @@ void easy_maze(){
 void hard_maze(){
     string row_check,column_check,map_name,path_check,cell_min_check,cell_max_check,block_max_check,block_min_check;int path_size,cell_min,cell_max,block_min,block_max;
     //getting map name to save it
-    cout << YELLOW << "Enter your map name: " << RESET;
+    cout << CYAN << "Enter your map name: " << RESET;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
 map_name_error:
     cout.flush();
@@ -243,7 +248,7 @@ map_name_error:
     map_name = fix_name(map_name);//here we use that function to replace spaces with '_'
     cout << endl;
     //getting number of rows
-    cout << YELLOW << "How many rows do you like to have?" << RESET << endl;
+    cout << CYAN << "How many rows do you like to have?" << RESET << endl;
 check_row:
     cin >> row_check;
     //checking for valid row
@@ -253,7 +258,7 @@ check_row:
     }
     const int rows = stoi(row_check);
     //getting number of columns
-    cout << YELLOW << "How many columns do you like to have?" << RESET << endl;
+    cout << CYAN << "How many columns do you like to have?" << RESET << endl;
 check_column:
     cin >> column_check;
     //checking for valid column
@@ -265,7 +270,7 @@ check_column:
     //the maze definition
     vector<vector<int>> grid(rows,vector<int>(cols,0));
     //getting maximum and minimum of maze cells
-    cout << YELLOW << "Enter a minimum for your maze cells: " << RESET << endl;
+    cout << CYAN << "Enter a minimum for your maze cells: " << RESET << endl;
 check_minimum:
     cin >> cell_min_check;
     if(isnumber(cell_min_check) == false){
@@ -273,7 +278,7 @@ check_minimum:
         goto check_minimum;
     }
     cell_min = stoi(cell_min_check);
-    cout << YELLOW << "Enter a maximum for your maze cells: " << RESET << endl;
+    cout << CYAN << "Enter a maximum for your maze cells: " << RESET << endl;
 check_maximum:
     cin >> cell_max_check;
     if(isnumber(cell_max_check) == false || stoi(cell_max_check) < cell_min){
@@ -282,7 +287,7 @@ check_maximum:
     }
     cell_max = stoi(cell_max_check);
     //getting number of steps
-    cout << YELLOW << "How many steps are there in your path?" << RESET << endl;
+    cout << CYAN << "How many steps are there in your path?" << RESET << endl;
 check_path:
     cin >> path_check;
     //checking for valid path number
@@ -312,7 +317,7 @@ dfs_check:
         goto dfs_check;
     }
     //getting maximum and minimum of blocks
-    cout << YELLOW << "Enter a minimum number of the blocks: " << RESET << endl;
+    cout << CYAN << "Enter a minimum number of the blocks: " << RESET << endl;
 check_minimum2:
     cin >> block_min_check;
     if(isnumber(block_min_check) == false || stoi(block_min_check) < 0){
@@ -320,7 +325,7 @@ check_minimum2:
         goto check_minimum2;
     }
     block_min = stoi(block_min_check);
-    cout << YELLOW << "Choose a maximum number of the blocks: " << RESET << endl;
+    cout << CYAN << "Choose a maximum number of the blocks: " << RESET << endl;
 check_maximum2:
     cin >> block_max_check;
     if(isnumber(block_max_check) == false || stoi(block_max_check) < block_min || stoi(block_max_check) >= rows * cols - path_size){
@@ -399,8 +404,75 @@ check_maximum2:
     ofstream mapsfile("maps.txt", ios::app);
     mapsfile << map_name << "\n";
 }
+string map_choosing(){
+    ifstream file("maps.txt");
+    if(!file){
+        cerr << RED << "Error:No file found with such name,please check your files." << RESET << endl;
+        return "Error";
+    }
+    string line;vector<string> menu;
+    while(getline(file,line)){
+        if(!line.empty()){
+            menu.push_back(line);
+        }
+    }
+    for(int i = 0;i < menu.size(); i++){
+        cout << GREEN << i + 1 << ". " << YELLOW << menu[i] << RESET << endl;
+    }
+    string choice;
+    cout << CYAN << "choose your map: " << RESET << endl;
+    choice_error:
+    cin >> choice;
+    if(isnumber(choice) == false || stoi(choice) < 1 || stoi(choice) > menu.size()){
+        cout << RED << "Please enter a valid number: " << RESET << endl;
+        goto choice_error;
+    }
+    if(!isvalid_name(choice)){
+        cout << RED << "Please enter a valid number: " << RESET << endl;
+        goto choice_error;
+    }
+    string mapname;
+    for (int i = 0; i < menu.size(); i++) {
+        if (i + 1 == stoi(choice)) {
+            mapname = menu[i];
+            break;
+        }
+    }
+    file.close();
+    return mapname;
+}
+vector<vector<int>> getting_map_from_file(string mapname){
+    ifstream file(mapname);
+    int row,col,pathsize;
+    file >> row >> col >> pathsize;
+    vector<vector<int>> matrix(row,vector<int>(col));
+    for(int i = 0;i < row; i++){
+        for(int j = 0;j < col; j++){
+            file >> matrix[i][j];
+        }
+    }
+    file.close();
+    return matrix;
+}
+int getting_steps_from_file(string mapname){
+    ifstream file(mapname);
+    int value, cnt = 0;
 
+    while(file >> value){
+        cnt++;
+        if (cnt == 3){
+            return value;
+        }
+    }
+    file.close();
 
+}
+void choose_a_map_from_existing_maps(string mapname){
+    vector<vector<int>> grid = getting_map_from_file(mapname);
+    int steps = getting_steps_from_file(mapname);
+    bool result = play(grid,steps);
+    //continue
+}
 int main(){
     faster;
 start:
@@ -430,6 +502,7 @@ start:
             }
             cout << RESET << endl;
             easy_maze();
+            goto start;
         }
         else if(choice == "2"){
             //loading animation
@@ -445,6 +518,7 @@ start:
             }
             cout << RESET << endl;
             hard_maze();
+            goto start;
         }
         else{
             //loading animation
@@ -486,7 +560,12 @@ start:
                 i++;
             }
             cout << RESET << endl;
-
+            string mapname = map_choosing();
+            if(mapname == "Error"){
+                goto back_to_menu_after_file_error;
+            }
+            choose_a_map_from_existing_maps(mapname);
+            goto start;
         }
         else if(choice == "2"){
             //loading animation
@@ -501,9 +580,11 @@ start:
                 i++;
             }
             cout << RESET << endl;
+            goto start;
         }
         else{
             //loading animation
+            back_to_menu_after_file_error:
             char loading[] = {'|', '/', '-', '\\'};
             int i = 0;
             cout << CYAN << "Coming back to menu ";
